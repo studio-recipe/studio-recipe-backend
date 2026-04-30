@@ -1,0 +1,94 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: recipe-db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./initdb:/docker-entrypoint-initdb.d   # 초기화 스크립트
+      - ./data:/csv                             # CSV 파일
+    command: --local-infile=1                  # LOAD DATA LOCAL INFILE 허용
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DB_USERNAME}", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - recipe-net
+
+  redis:
+    image: redis:6-alpine
+    container_name: recipe-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    restart: always
+    networks:
+      - recipe-net
+
+  flask:
+    image: stayonasdev/studio-recipe-flask:latest
+    container_name: recipe-flask
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USERNAME}
+      DB_PASS: ${DB_PASSWORD}
+      DB_NAME: ${DB_DATABASE_NAME}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+    networks:
+      - recipe-net
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: studio-recipe
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${DB_DATABASE_NAME}?characterEncoding=utf8&serverTimezone=Asia/Seoul
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET_KEY}
+      JWT_ACCESS_TOKEN_VALIDITY_IN_SECONDS: ${JWT_ACCESS_TOKEN_VALIDITY_IN_SECONDS}
+      JWT_REFRESH_TOKEN_VALIDITY_IN_SECONDS: ${JWT_REFRESH_TOKEN_VALIDITY_IN_SECONDS}
+      FLASK_BASE_URL: http://flask:5000
+      FRONT_URL: ${FRONT_URL}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      flask:
+        condition: service_started
+    restart: always
+    networks:
+      - recipe-net
+
+networks:
+  recipe-net:
+    driver: bridge
+
+volumes:
+  db_data:
+  redis_data:
