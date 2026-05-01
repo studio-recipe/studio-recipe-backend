@@ -19,8 +19,8 @@ public class MailService {
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine  templateEngine; //Thymeleaf 템플릿 엔진
 
-//    @Value("${MAIL_USERNAME}")
-    private String fromEmail = "stay_on_track@naver.com";
+    @Value("${MAIL_USERNAME}")
+    private String fromEmail;
 
     /**
      * HTML 형식 인증 번호 이메일

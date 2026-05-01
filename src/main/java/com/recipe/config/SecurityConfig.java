@@ -32,8 +32,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
-//    @Value("${front.url}")
-    private String frontUrl = "http://localhost:5173";
+    @Value("${front.url}")
+    private String frontUrl;
 //     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 //     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 

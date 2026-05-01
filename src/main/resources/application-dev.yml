@@ -18,13 +18,6 @@ spring:
             show_sql: true
             defer-datasource-initialization: true
 
-   batch:
-      jdbc:
-         initialize-schema: always # Spring Batch 메타데이터 테이블 자동 생성
-         platform: mariadb
-      job:
-         enabled: false # 애플리케이션 시작 시 Job 자동 실행 방지 (수동 실행 위함)
-
    mail:
      host: ${MAIL_HOST}
      port: ${MAIL_PORT}

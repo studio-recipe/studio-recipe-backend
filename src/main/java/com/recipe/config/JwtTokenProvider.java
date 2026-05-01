@@ -29,12 +29,11 @@ public class JwtTokenProvider {
     private final Key key;
     private final long accessTokenValiditySeconds = 8640000;
     private final long refreshTokenValiditySeconds = 3600000;
-    private String secretKey = "dI5pBjrtgy9xFHiZtMs3fM7P8OR/wvxrexu/mybWcKc=";
 
     public JwtTokenProvider(
-//            @Value("${JWT_SECRET}") String secretKey,
-//            @Value("${JWT_ACCESS_TOKEN_VALIDITY_IN_SECONDS}") long accessTokenValiditySeconds,
-//            @Value("${JWT_REFRESH_TOKEN_VALIDITY_IN_SECONDS}") long refreshTokenValiditySeconds
+            @Value("${JWT_SECRET}") String secretKey,
+            @Value("${JWT_ACCESS_TOKEN_VALIDITY_IN_SECONDS}") long accessTokenValiditySeconds,
+            @Value("${JWT_REFRESH_TOKEN_VALIDITY_IN_SECONDS}") long refreshTokenValiditySeconds
     ) {
 
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);

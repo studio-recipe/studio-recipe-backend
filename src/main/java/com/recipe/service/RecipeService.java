@@ -22,7 +22,6 @@ public class RecipeService {
 
     private final RecipeRepository recipeRepository;
     private final UserReferencesService referenceService;
-    private final UserService userService;
 
     @Transactional
     public Page<RecipeResponseDTO> readRecipePage(Pageable pageable) {

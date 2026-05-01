@@ -26,7 +26,6 @@ import java.util.List;
 class RecipeControllerImpl implements RecipeController {
 
     private final RecipeService recipeService;
-    private final AuthService authService;
     private final RecommendationService recommendationService;
 
 
