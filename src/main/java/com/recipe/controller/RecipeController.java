@@ -1,7 +1,7 @@
 package com.recipe.controller;
 
 import com.recipe.domain.dto.recipe.PageRequestDTO;
-import com.recipe.domain.dto.SortBy;
+import com.recipe.domain.dto.recipe.SortBy;
 import com.recipe.config.CustomerDetails;
 import com.recipe.domain.dto.recipe.RecipeResponseDTO;
 import com.recipe.service.RecipeService;
