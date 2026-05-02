@@ -1,6 +1,6 @@
 package com.recipe.service;
 
-import com.recipe.domain.dto.Recipe.RecipeResponseDTO;
+import com.recipe.domain.dto.recipe.RecipeResponseDTO;
 import com.recipe.domain.entity.Recipe;
 import com.recipe.repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,9 +1,7 @@
 package com.recipe.service;
 
-import com.recipe.domain.dto.Recipe.RecipeResponseDTO;
-import com.recipe.domain.dto.ResponseLikeStatus;
+import com.recipe.domain.dto.recipe.RecipeResponseDTO;
 import com.recipe.domain.entity.Recipe;
-import com.recipe.domain.entity.User;
 import com.recipe.exceptions.recipe.RecipeExceptions;
 import com.recipe.repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;

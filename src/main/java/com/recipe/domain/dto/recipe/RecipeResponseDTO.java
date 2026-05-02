@@ -1,4 +1,4 @@
-package com.recipe.domain.dto.Recipe;
+package com.recipe.domain.dto.recipe;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

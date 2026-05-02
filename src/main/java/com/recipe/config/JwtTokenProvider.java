@@ -27,19 +27,18 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     private final Key key;
-    private final long accessTokenValiditySeconds = 8640000;
-    private final long refreshTokenValiditySeconds = 3600000;
+    private final long accessTokenValiditySeconds;
+    private final long refreshTokenValiditySeconds;
 
     public JwtTokenProvider(
-            @Value("${JWT_SECRET}") String secretKey,
+            @Value("${JWT_SECRET_KEY}") String secretKey,
             @Value("${JWT_ACCESS_TOKEN_VALIDITY_IN_SECONDS}") long accessTokenValiditySeconds,
             @Value("${JWT_REFRESH_TOKEN_VALIDITY_IN_SECONDS}") long refreshTokenValiditySeconds
     ) {
-
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
-//        this.accessTokenValiditySeconds = accessTokenValiditySeconds * 1000;
-//        this.refreshTokenValiditySeconds = refreshTokenValiditySeconds * 1000;
+        this.accessTokenValiditySeconds = accessTokenValiditySeconds * 1000;
+        this.refreshTokenValiditySeconds = refreshTokenValiditySeconds * 1000;
     }
 
     //Access Token, Refresh Token 모두 사용 이유 -> 둘의 구분은 시간이다.

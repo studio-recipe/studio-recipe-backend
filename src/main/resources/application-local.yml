@@ -3,11 +3,10 @@ spring:
     import: optional:file:.env[.properties]
 
   datasource:
-#    driver-class-name: org.mariadb.jdbc.Driver
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: "jdbc:mysql://localhost:3306/recipe?characterEncoding=utf8&serverTimezone=Asia/Seoul&useGssapi=false"
-    username: root
-    password: "tlwkrdmldkdlA!"
+    url: ${DB_LOCAL_URL}
+    username: ${DB_LOCAL_USERNAME}
+    password: ${DB_LOCAL_PASSWORD}
 
   jackson:
     serialization:
@@ -20,13 +19,13 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
-    database-platform: org.hibernate.dialect.MariaDBDialect
+
 
   mail:
-    host: smtp.naver.com
-    port: 465
-    username: stay_on_track@naver.com
-    password: KVRG8UGYM9ZJ
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail.smtp.auth: true
       mail.smtp.ssl.enable: true
@@ -39,15 +38,15 @@ spring:
       host: localhost
       port: 6379
 
-jwt:
-  secret: dI5pBjrtgy9xFHiZtMs3fM7P8OR/wvxrexu/mybWcKc=
-  access-token-validity-in-seconds: 3600
-  refresh-token-validity-in-seconds: 86400
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
 
-thymeleaf:
-  cache: false
-  prefix: classpath:/templates/
-  suffix: .html
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  access-token-validity-in-seconds: ${JWT_ACCESS_TOKEN_VALIDITY_IN_SECONDS}
+  refresh-token-validity-in-seconds: ${JWT_REFRESH_TOKEN_VALIDITY_IN_SECONDS}
 
 server:
   port: 8080
@@ -55,10 +54,10 @@ server:
     context-path: /studio-recipe
 
 front:
-  urls: "http://localhost:5173,https://rapa8.shop,https://www.rapa8.shop"
+  url: ${FRONT_URL}
 
 recommender:
-  flask-base-url: ${FLASK_BASE_URL:http://flask:5000}
+  flask-base-url: ${FLASK_BASE_URL:http://localhost:5000}
 
 logging:
   level:
@@ -71,4 +70,3 @@ management:
     web:
       exposure:
         include: "health"
-

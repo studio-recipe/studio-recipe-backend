@@ -1,7 +1,5 @@
 package com.recipe.controller;
 
-import com.recipe.controller.inter.AuthController;
-import com.recipe.controller.inter.UserController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,21 +11,18 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
-public class UserControllerImpl implements UserController{
+@Tag(name = "사용자", description = "사용자 관련 API (미구현)")
+public class UserController {
 
+    @Operation(summary = "마이페이지 조회", description = "미구현")
     @GetMapping("/my-pages/{userId}")
-    public ResponseEntity<Void> myPage(@PathVariable("userId") Long userId) {
+    public ResponseEntity<Void> myPage(@PathVariable Long userId) {
         return ResponseEntity.ok().build();
     }
 
-
-    @Operation(summary = "회원 상세 페이지 수정",
-            description = "회원이 수정한 데이터로 회원 테이블 수정")
+    @Operation(summary = "마이페이지 수정", description = "미구현")
     @PutMapping("/my-pages")
-    public ResponseEntity<Void> updateMyPage(/*@RequestBody*/) {
+    public ResponseEntity<Void> updateMyPage() {
         return ResponseEntity.ok().build();
     }
-
-    //탈퇴
-    
 }

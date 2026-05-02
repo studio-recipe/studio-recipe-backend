@@ -1,44 +1,36 @@
 spring:
-  # H2 관련 자동 구성 제외
-#   autoconfigure:
-#     exclude:
-#       - org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration # H2 콘솔 자동 구성
-#       - org.springframework.boot.autoconfigure.jdbc.h2.H2AutoConfiguration # H2 JDBC 자동 구성
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
-   datasource:
-#      driver-class-name: org.mariadb.jdbc.Driver
-      driver-class-name: com.mysql.cj.jdbc.Driver
-
-   jpa:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
       hibernate:
-         ddl-auto: update
-      properties:
-         hibernate:
-            format_sql: true
-            show_sql: true
-            defer-datasource-initialization: true
+        format_sql: true
+        show_sql: true
 
-   mail:
-     host: ${MAIL_HOST}
-     port: ${MAIL_PORT}
-     username: ${MAIL_USERNAME}
-     password: ${MAIL_PASSWORD}
-     properties:
-       mail.smtp.auth: true
-       mail.smtp.ssl.enable: true
-       mail.smtp.timeout: 5000               # 연결 타임아웃
-       mail.smtp.connectiontimeout: 5000     # 연결 타임아웃
-       mail.smtp.writetimeout: 5000          # 쓰기 타임아웃
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.ssl.enable: true
+      mail.smtp.timeout: 5000
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.writetimeout: 5000
 
-   data:
-     redis:
-       host: redis
-       port: 6379
+  data:
+    redis:
+      host: redis
+      port: 6379
 
-   thymeleaf:
-     cache: false
-     prefix: classpath:/templates/
-     suffix: .html
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
 
 jwt:
   secret: ${JWT_SECRET_KEY}
@@ -50,12 +42,11 @@ server:
   servlet:
     context-path: /studio-recipe
 
-recommender:
-  flask-base-url: ${FLASK_BASE_URL:http://flask:5000}
-
 front:
   url: ${FRONT_URL}
 
+recommender:
+  flask-base-url: ${FLASK_BASE_URL:http://flask:5000}
 
 logging:
   level:
