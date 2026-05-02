@@ -42,10 +42,8 @@ public class RecommendationService {
 
         List<Long> idList = Arrays.asList(ids);
 
-
         List<Recipe> recipes = recipeRepository.findByRcpSnoIn(idList);
         if (recipes == null || recipes.isEmpty()) return List.of();
-
 
         Map<Long, Recipe> map = recipes.stream()
                 .collect(Collectors.toMap(Recipe::getRcpSno, r -> r));
@@ -53,28 +51,9 @@ public class RecommendationService {
         List<RecipeResponseDTO> result = new ArrayList<>();
         for (Long id : idList) {
             Recipe r = map.get(id);
-            if (r != null) result.add(toDto(r));
+            if (r != null) result.add(RecipeResponseDTO.fromEntity(r));
         }
 
         return result;
-    }
-
-    private RecipeResponseDTO toDto(Recipe r) {
-        return RecipeResponseDTO.builder()
-                .rcpSno(r.getRcpSno())
-                .rcpTtl(r.getRcpTtl())
-                .ckgNm(r.getCkgNm())
-                .inqCnt(r.getInqCnt())
-                .rcmmCnt(r.getRcmmCnt())
-                .ckgMthActoNm(r.getCkgMthActoNm())
-                .ckgMtrlActoNm(r.getCkgMtrlActoNm())
-                .ckgKndActoNm(r.getCkgKndActoNm())
-                .ckgMtrlCn(r.getCkgMtrlCn())
-                .ckgInbunNm(r.getCkgInbunNm())
-                .ckgDodfNm(r.getCkgDodfNm())
-                .ckgTimeNm(r.getCkgTimeNm())
-                .firstRegDt(r.getFirstRegDt())
-                .rcpImgUrl(r.getRcpImgUrl())
-                .build();
     }
 }

@@ -1,8 +1,8 @@
 package com.recipe.controller;
 
 import com.recipe.domain.dto.auth.*;
-import com.recipe.domain.dto.user.UserLoginRequestDTO;
-import com.recipe.domain.dto.user.UserRegisterRequestDTO;
+import com.recipe.domain.dto.auth.UserLoginRequestDTO;
+import com.recipe.domain.dto.auth.UserRegisterRequestDTO;
 import com.recipe.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

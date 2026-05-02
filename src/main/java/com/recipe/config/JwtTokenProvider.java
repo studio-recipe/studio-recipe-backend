@@ -1,6 +1,5 @@
 package com.recipe.config;
 
-import com.recipe.domain.dto.auth.CustomerDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

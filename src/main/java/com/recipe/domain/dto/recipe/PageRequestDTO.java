@@ -1,5 +1,6 @@
-package com.recipe.domain.dto;
+package com.recipe.domain.dto.recipe;
 
+import com.recipe.domain.dto.SortBy;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;

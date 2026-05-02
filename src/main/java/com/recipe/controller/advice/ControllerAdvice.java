@@ -3,7 +3,6 @@ package com.recipe.controller.advice;
 import com.recipe.exceptions.recipe.RecipeException;
 import com.recipe.exceptions.user.UserException;
 import lombok.extern.log4j.Log4j2;
-import org.apache.coyote.Response;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,21 +40,6 @@ public class ControllerAdvice {
         errors.put("message", ex.getMessage());
         return ResponseEntity.status(status).body(errors);
     }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> MethodArgumentNotValidEx(MethodArgumentNotValidException ex){
-        Map<String, Object> errors = new HashMap<>();
-
-        ex.getBindingResult().getFieldErrors().forEach((fieldError) -> {
-            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
-        });
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-        }
-
-        @ExceptionHandler(IllegalStateException.class)
-        public ResponseEntity<?> handleIllegalStateEx(IllegalStateException ex){
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
-        }
 
         @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<?> handleDataIntegrityViolationException(DataIntegrityViolationException ex){

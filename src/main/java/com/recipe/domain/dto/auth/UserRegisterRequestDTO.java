@@ -1,10 +1,8 @@
-package com.recipe.domain.dto.user;
+package com.recipe.domain.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.recipe.domain.entity.enums.Gender;
 import jakarta.validation.constraints.*;
 import lombok.*;

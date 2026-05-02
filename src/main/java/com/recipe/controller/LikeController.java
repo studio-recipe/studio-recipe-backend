@@ -1,7 +1,7 @@
 package com.recipe.controller;
 
-import com.recipe.domain.dto.ResponseLikeStatus;
-import com.recipe.domain.dto.auth.CustomerDetails;
+import com.recipe.domain.dto.like.ResponseLikeStatus;
+import com.recipe.config.CustomerDetails;
 import com.recipe.domain.dto.recipe.RecipeResponseDTO;
 import com.recipe.service.LikeService;
 import io.swagger.v3.oas.annotations.Operation;

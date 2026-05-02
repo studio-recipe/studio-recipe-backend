@@ -1,7 +1,7 @@
 package com.recipe.service;
 
 import com.recipe.domain.dto.recipe.RecipeResponseDTO;
-import com.recipe.domain.dto.ResponseLikeStatus;
+import com.recipe.domain.dto.like.ResponseLikeStatus;
 import com.recipe.domain.entity.Like;
 import com.recipe.domain.entity.Recipe;
 import com.recipe.domain.entity.User;

@@ -1,13 +1,7 @@
-package com.recipe.domain.dto.user;
+package com.recipe.domain.dto.auth;
 
-import com.recipe.domain.entity.enums.Gender;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-
-import java.time.LocalDate;
 
 @Builder
 @Getter

@@ -1,6 +1,6 @@
 package com.recipe.service;
 
-import com.recipe.domain.dto.auth.CustomerDetails;
+import com.recipe.config.CustomerDetails;
 import com.recipe.domain.entity.User;
 import com.recipe.exceptions.user.UserExceptions;
 import com.recipe.repository.UserRepository;

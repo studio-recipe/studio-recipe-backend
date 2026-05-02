@@ -2,8 +2,8 @@ package com.recipe.service;
 
 import com.recipe.config.JwtTokenProvider;
 import com.recipe.domain.dto.auth.TokenResponseDTO;
-import com.recipe.domain.dto.user.UserLoginRequestDTO;
-import com.recipe.domain.dto.user.UserRegisterRequestDTO;
+import com.recipe.domain.dto.auth.UserLoginRequestDTO;
+import com.recipe.domain.dto.auth.UserRegisterRequestDTO;
 import com.recipe.domain.entity.User;
 import com.recipe.domain.entity.enums.Role;
 import com.recipe.exceptions.user.UserExceptions;

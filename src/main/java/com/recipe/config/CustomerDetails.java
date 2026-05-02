@@ -1,4 +1,4 @@
-package com.recipe.domain.dto.auth;
+package com.recipe.config;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

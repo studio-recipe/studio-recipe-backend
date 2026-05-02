@@ -1,4 +1,4 @@
-package com.recipe.domain.dto;
+package com.recipe.domain.dto.like;
 
 import lombok.Builder;
 import lombok.Getter;
