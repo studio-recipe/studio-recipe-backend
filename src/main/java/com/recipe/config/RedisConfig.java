@@ -1,6 +1,5 @@
 package com.recipe.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -22,11 +21,5 @@ public class RedisConfig {
         redisTemplate.setHashValueSerializer(new StringRedisSerializer());
 
         return redisTemplate;
-    }
-
-    // JSON 직렬화를 위한 ObjectMapper 빈
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new  ObjectMapper();
     }
 }
