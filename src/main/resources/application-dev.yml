@@ -48,6 +48,23 @@ front:
 recommender:
   flask-base-url: ${FLASK_BASE_URL:http://flask:5000}
 
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus, metrics, info
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: studio-recipe
+      namespace: docker-compose #대시보드 임포트 -> 쿠버네티스 환경 기반이라 namespace 지정
+
 logging:
   level:
     org.hibernate.SQL: debug

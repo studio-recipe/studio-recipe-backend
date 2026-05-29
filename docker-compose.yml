@@ -11,9 +11,9 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
-      - ./initdb:/docker-entrypoint-initdb.d   # 초기화 스크립트
-      - ./data:/csv                             # CSV 파일
-    command: --local-infile=1                  # LOAD DATA LOCAL INFILE 허용
+      - ./initdb:/docker-entrypoint-initdb.d
+      - ./data:/csv
+    command: --local-infile=1
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DB_USERNAME}", "-p${DB_PASSWORD}"]
       interval: 10s
@@ -44,6 +44,12 @@ services:
       DB_USER: ${DB_USERNAME}
       DB_PASS: ${DB_PASSWORD}
       DB_NAME: ${DB_DATABASE_NAME}
+      CACHE_ENABLED: ${CACHE_ENABLED:-true}
+      CACHE_BACKEND: ${CACHE_BACKEND:-local}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 1
+      REDIS_TTL: 300
     depends_on:
       db:
         condition: service_healthy
@@ -52,9 +58,10 @@ services:
       - recipe-net
 
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: stayonasdev/studio-recipe-backend:latest
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
     container_name: studio-recipe
     ports:
       - "8080:8080"
@@ -73,7 +80,6 @@ services:
       MAIL_PORT: ${MAIL_PORT}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-
     depends_on:
       db:
         condition: service_healthy
@@ -85,6 +91,54 @@ services:
     networks:
       - recipe-net
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: recipe-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=7d'
+    restart: always
+    networks:
+      - recipe-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: recipe-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: false
+      GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    restart: always
+    networks:
+      - recipe-net
+
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    container_name: recipe-renderer
+    networks:
+      recipe-net:
+        aliases:
+          - renderer
+    ports:
+      - "8082:8081"
+    environment:
+      ENABLE_METRICS: "true"
+    restart: always
+
 networks:
   recipe-net:
     driver: bridge
@@ -92,3 +146,5 @@ networks:
 volumes:
   db_data:
   redis_data:
+  prometheus_data:
+  grafana_data:

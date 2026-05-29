@@ -11,4 +11,5 @@ public class TokenResponseDTO {
     private Long accessTokenExpiresIn;
     private String refreshToken;
     private Long refreshTokenExpiresIn;
+    private String role;
 }

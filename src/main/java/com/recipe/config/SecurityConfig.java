@@ -1,5 +1,6 @@
 package com.recipe.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -77,11 +78,26 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         "/v3/api-docs",
-                                        "/error"
+                                        "/error",
+                                        "/actuator/health",
+                                        "/actuator/prometheus"
                                 ).permitAll() // 위의 경로들은 인증 없이 접근 허용
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                // 나머지 모든 요청은 인증된 사용자만 허용
+                                // 나머지는 로그인 필요 (좋아요, 추천 등)
                                 .anyRequest().authenticated()
+                )
+                //인증 실패시 기본 401 반환 (리다이렉트 없이)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) ->{
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"message\": \"로그인이 필요합니다.\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"message\": \"접근 권한이 없습니다.\"");
+                        })
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class);

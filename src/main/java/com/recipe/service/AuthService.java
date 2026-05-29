@@ -13,6 +13,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -66,26 +67,26 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.getId(), request.getPassword());
 
         //인증 수행, CustomerDetailService가 사용자 정보 로드, (비밀번호 비교)
-        //authenticate 실행될 때CustomerDetailService - loadUserByUsername 메서드 호출
-//        Authentication authentication =
-//                authenticationManager.getObject().authenticate(authenticationToken);
-     Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
         //인증 정보 저장 (요청 처리 동안 사용 가능)
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        //권한 추출
+        String role = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse("ROLE_GUEST");
+
         String accessToken = jwtTokenProvider.createAccessToken(authentication);
         String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
-
-        //Refresh Token은 DB or Redis에 저장하여 관리? 코드 필요
-
-//        CustomerDetails userDetails = (CustomerDetails) authentication.getPrincipal();
 
         return TokenResponseDTO.builder()
                 .accessToken(accessToken)
                 .accessTokenExpiresIn(jwtTokenProvider.getAccessTokenValiditySeconds())
                 .refreshToken(refreshToken)
                 .refreshTokenExpiresIn(jwtTokenProvider.getRefreshTokenValiditySeconds())
+                .role(role)
                 .build();
     }
 
