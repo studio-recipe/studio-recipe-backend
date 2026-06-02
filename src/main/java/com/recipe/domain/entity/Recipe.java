@@ -1,5 +1,6 @@
 package com.recipe.domain.entity;
 
+import com.recipe.domain.dto.recipe.RecipeRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Recipe {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "RCP_SNO")
@@ -40,9 +42,8 @@ public class Recipe {
     @Column(name = "CKG_KND_ACTO_NM")
     private String ckgKndActoNm;
 
-    //파싱
     @Lob
-    @Column(name = "CKG_MTRL_CN",  columnDefinition = "TEXT")
+    @Column(name = "CKG_MTRL_CN", columnDefinition = "TEXT")
     private String ckgMtrlCn;
 
     @Column(name = "CKG_INBUN_NM")
@@ -60,16 +61,37 @@ public class Recipe {
     @Column(name = "RCP_IMG_URL")
     private String rcpImgUrl;
 
-    public void likeToCountUp(){
-        rcmmCnt++;
-    }
+    // ── 작성자 연관관계 ─────────────────────────────────────
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private User author;
+
+    // ── 비즈니스 메서드 ─────────────────────────────────────
+    public void likeToCountUp() { rcmmCnt++; }
 
     public void likeToCountDown() {
-        if(rcmmCnt > 0)  rcmmCnt--;
+        if (rcmmCnt > 0) rcmmCnt--;
     }
 
     public void viewCountUp() {
         if (inqCnt == null) inqCnt = 0;
         inqCnt++;
+    }
+
+    public boolean isAuthor(Long userId) {
+        return this.author != null && this.author.getUserId().equals(userId);
+    }
+
+    public void update(RecipeRequestDTO request) {
+        this.rcpTtl        = request.getRcpTtl();
+        this.ckgNm         = request.getCkgNm();
+        this.ckgMthActoNm  = request.getCkgMthActoNm();
+        this.ckgMtrlActoNm = request.getCkgMtrlActoNm();
+        this.ckgKndActoNm  = request.getCkgKndActoNm();
+        this.ckgMtrlCn     = request.getCkgMtrlCn();
+        this.ckgInbunNm    = request.getCkgInbunNm();
+        this.ckgDodfNm     = request.getCkgDodfNm();
+        this.ckgTimeNm     = request.getCkgTimeNm();
+        this.rcpImgUrl     = request.getRcpImgUrl();
     }
 }

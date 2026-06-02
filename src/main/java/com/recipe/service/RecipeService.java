@@ -1,7 +1,9 @@
 package com.recipe.service;
 
+import com.recipe.domain.dto.recipe.RecipeRequestDTO;
 import com.recipe.domain.dto.recipe.RecipeResponseDTO;
 import com.recipe.domain.entity.Recipe;
+import com.recipe.domain.entity.User;
 import com.recipe.exceptions.recipe.RecipeExceptions;
 import com.recipe.repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -20,35 +21,65 @@ public class RecipeService {
 
     private final RecipeRepository recipeRepository;
     private final UserReferencesService referenceService;
+    private final UserService userService;
 
     @Transactional
     public Page<RecipeResponseDTO> readRecipePage(Pageable pageable) {
         log.info("Service readRecipePage");
         Page<Recipe> recipePage = recipeRepository.findAll(pageable);
-        if(recipePage.getNumberOfElements() <= 0){
-            log.info("Request Page page >>>>> {}", recipePage.getTotalElements());
-            log.info("Request Page size >>>>> {}", recipePage.getSize());
-            log.info("Response Page Total Count >>>>> {}", recipePage.getNumberOfElements());
+        if (recipePage.getNumberOfElements() <= 0) {
             throw RecipeExceptions.NOT_FOUND.getRecipeException();
         }
         return recipePage.map(RecipeResponseDTO::fromEntity);
     }
 
     @Transactional
-    public  RecipeResponseDTO findOneRecipe(Long recipeId, Long userId) {
+    public RecipeResponseDTO findOneRecipe(Long recipeId, Long userId) {
         log.info("Service findOneRecipe");
-
         Recipe findRecipe = findByRecipeId(recipeId);
-
         findRecipe.viewCountUp();
         referenceService.userRecipeView(findRecipe, userId);
-
         return RecipeResponseDTO.fromEntity(findRecipe);
     }
 
+    // ── 등록 ───────────────────────────────────────────────
+    @Transactional
+    public RecipeResponseDTO createRecipe(RecipeRequestDTO request, Long userId) {
+        log.info("Service createRecipe userId={}", userId);
+        User author = userService.findByUser(userId);
+        Recipe recipe = request.toEntity(author);
+        return RecipeResponseDTO.fromEntity(recipeRepository.save(recipe));
+    }
+
+    // ── 수정 ───────────────────────────────────────────────
+    @Transactional
+    public RecipeResponseDTO updateRecipe(Long recipeId, RecipeRequestDTO request, Long userId) {
+        log.info("Service updateRecipe recipeId={} userId={}", recipeId, userId);
+        Recipe recipe = findByRecipeId(recipeId);
+
+        if (!recipe.isAuthor(userId)) {
+            throw RecipeExceptions.FORBIDDEN.getRecipeException();
+        }
+
+        recipe.update(request);
+        return RecipeResponseDTO.fromEntity(recipe);
+    }
+
+    // ── 삭제 ───────────────────────────────────────────────
+    @Transactional
+    public void deleteRecipe(Long recipeId, Long userId) {
+        log.info("Service deleteRecipe recipeId={} userId={}", recipeId, userId);
+        Recipe recipe = findByRecipeId(recipeId);
+
+        if (!recipe.isAuthor(userId)) {
+            throw RecipeExceptions.FORBIDDEN.getRecipeException();
+        }
+
+        recipeRepository.delete(recipe);
+    }
+
     public Recipe findByRecipeId(Long recipeId) {
-        return recipeRepository.findById(recipeId).orElseThrow(
-                () -> RecipeExceptions.NOT_FOUND.getRecipeException()
-        );
+        return recipeRepository.findById(recipeId)
+                .orElseThrow(() -> RecipeExceptions.NOT_FOUND.getRecipeException());
     }
 }

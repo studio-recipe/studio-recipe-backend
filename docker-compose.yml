@@ -63,6 +63,8 @@ services:
 #      context: .
 #      dockerfile: Dockerfile
     container_name: studio-recipe
+    volumes:
+      - ./uploads:/app/uploads
     ports:
       - "8080:8080"
     environment:

@@ -80,7 +80,8 @@ public class SecurityConfig {
                                         "/v3/api-docs",
                                         "/error",
                                         "/actuator/health",
-                                        "/actuator/prometheus"
+                                        "/actuator/prometheus",
+                                        "/images/**"
                                 ).permitAll() // 위의 경로들은 인증 없이 접근 허용
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 // 나머지는 로그인 필요 (좋아요, 추천 등)
