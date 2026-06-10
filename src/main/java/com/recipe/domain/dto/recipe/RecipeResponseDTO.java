@@ -49,4 +49,10 @@ public class RecipeResponseDTO {
                 .rcpImgUrl(recipe.getRcpImgUrl())
                 .build();
     }
+
+    public static RecipeResponseDTO fromEntity(Recipe recipe, int inqCnt) {
+        RecipeResponseDTO dto = fromEntity(recipe);
+        dto.setInqCnt(inqCnt);
+        return dto;
+    }
 }

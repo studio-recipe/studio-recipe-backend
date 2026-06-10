@@ -7,7 +7,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        show_sql: true
+#        show_sql: true
   mail:
     host: ${MAIL_HOST}
     port: ${MAIL_PORT}
@@ -27,6 +27,9 @@ spring:
     cache: false
     prefix: classpath:/templates/
     suffix: .html
+  web:
+    pageable:
+      default-page-size: 10
 
 jwt:
   secret: ${JWT_SECRET_KEY}
@@ -71,3 +74,10 @@ logging:
     org.springframework.security: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: trace
     com.recipe: debug
+
+  hikari:
+    maximum-pool-size: 20
+    minimum-idle: 5
+    connection-timeout: 30000
+    idle-timeout: 600000
+    max-lifetime: 1800000

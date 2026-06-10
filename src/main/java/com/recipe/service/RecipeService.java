@@ -22,6 +22,7 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final UserReferencesService referenceService;
     private final UserService userService;
+    private final ViewCountService viewCountService;
 
     @Transactional
     public Page<RecipeResponseDTO> readRecipePage(Pageable pageable) {
@@ -35,14 +36,23 @@ public class RecipeService {
 
     @Transactional
     public RecipeResponseDTO findOneRecipe(Long recipeId, Long userId) {
-        log.info("Service findOneRecipe");
         Recipe findRecipe = findByRecipeId(recipeId);
-        findRecipe.viewCountUp();
+
+        // Redis에 쌓인 조회수 합산
+        Long redisCount = viewCountService.getRedisViewCount(recipeId);
+        int totalInqCnt = (findRecipe.getInqCnt() == null ? 0 : findRecipe.getInqCnt())
+                + redisCount.intValue();
+
+        // 조회수 증가 → Redis -> Batch
+        viewCountService.incrementViewCount(recipeId);
+
+        // 행동 로그 → 로그인한 사용자만
         referenceService.userRecipeView(findRecipe, userId);
-        return RecipeResponseDTO.fromEntity(findRecipe);
+
+        // inqCnt를 합산값으로 override해서 반환
+        return RecipeResponseDTO.fromEntity(findRecipe, totalInqCnt);
     }
 
-    // ── 등록 ───────────────────────────────────────────────
     @Transactional
     public RecipeResponseDTO createRecipe(RecipeRequestDTO request, Long userId) {
         log.info("Service createRecipe userId={}", userId);
@@ -51,30 +61,24 @@ public class RecipeService {
         return RecipeResponseDTO.fromEntity(recipeRepository.save(recipe));
     }
 
-    // ── 수정 ───────────────────────────────────────────────
     @Transactional
     public RecipeResponseDTO updateRecipe(Long recipeId, RecipeRequestDTO request, Long userId) {
         log.info("Service updateRecipe recipeId={} userId={}", recipeId, userId);
         Recipe recipe = findByRecipeId(recipeId);
-
         if (!recipe.isAuthor(userId)) {
             throw RecipeExceptions.FORBIDDEN.getRecipeException();
         }
-
         recipe.update(request);
         return RecipeResponseDTO.fromEntity(recipe);
     }
 
-    // ── 삭제 ───────────────────────────────────────────────
     @Transactional
     public void deleteRecipe(Long recipeId, Long userId) {
         log.info("Service deleteRecipe recipeId={} userId={}", recipeId, userId);
         Recipe recipe = findByRecipeId(recipeId);
-
         if (!recipe.isAuthor(userId)) {
             throw RecipeExceptions.FORBIDDEN.getRecipeException();
         }
-
         recipeRepository.delete(recipe);
     }
 
