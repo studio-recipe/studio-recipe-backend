@@ -40,6 +40,29 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    @Operation(summary = "Access/Refresh Token 재발급 (RTR)",
+            description = "Refresh Token을 검증하고 Access/Refresh Token을 모두 새로 발급합니다. " +
+                    "이미 회전되어 폐기된 Refresh Token이 재사용되면 탈취로 간주해 세션을 즉시 종료합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "재발급 성공"),
+                    @ApiResponse(responseCode = "401", description = "Refresh Token이 유효하지 않거나 재사용이 감지됨")
+            })
+    @PostMapping("/reissue")
+    public ResponseEntity<TokenResponseDTO> reissue(@RequestHeader("Refresh-Token") String refreshToken) {
+        return ResponseEntity.ok(authService.reissue(refreshToken));
+    }
+
+    @Operation(summary = "로그아웃",
+            description = "Redis에 저장된 Refresh Token을 삭제합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "로그아웃 성공")
+            })
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestHeader("Refresh-Token") String refreshToken) {
+        authService.logout(refreshToken);
+        return ResponseEntity.ok().build();
+    }
+
     @Operation(summary = "회원가입",
             description = "사용자 계정 생성",
             responses = {

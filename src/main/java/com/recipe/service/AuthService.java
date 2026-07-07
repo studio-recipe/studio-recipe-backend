@@ -1,11 +1,13 @@
 package com.recipe.service;
 
+import com.recipe.config.CustomerDetails;
 import com.recipe.config.JwtTokenProvider;
 import com.recipe.domain.dto.auth.TokenResponseDTO;
 import com.recipe.domain.dto.auth.UserLoginRequestDTO;
 import com.recipe.domain.dto.auth.UserRegisterRequestDTO;
 import com.recipe.domain.entity.User;
 import com.recipe.domain.entity.enums.Role;
+import com.recipe.exceptions.auth.AuthExceptions;
 import com.recipe.exceptions.user.UserExceptions;
 import com.recipe.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public void registerUser(UserRegisterRequestDTO request) {
@@ -81,6 +84,49 @@ public class AuthService {
         String accessToken = jwtTokenProvider.createAccessToken(authentication);
         String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
 
+        CustomerDetails principal = (CustomerDetails) authentication.getPrincipal();
+        refreshTokenService.save(principal.getUserId(), refreshToken);
+
+        return buildTokenResponse(accessToken, refreshToken, role);
+    }
+
+    /**
+     * Refresh Token Rotation(RTR) + Grace Period.
+     * 조회, 비교, 회전/유예 판정, Redis 기록까지를 RefreshTokenService.processReissue()의 Lua 스크립트로
+     * 원자적으로 처리해, 동시 요청이 서로의 회전 결과를 덮어쓰는 경합(TOCTOU)이 생기지 않도록 한다.
+     */
+    @Transactional
+    public TokenResponseDTO reissue(String refreshToken) {
+        if (!jwtTokenProvider.validateToken(refreshToken) || !jwtTokenProvider.isRefreshToken(refreshToken)) {
+            throw AuthExceptions.INVALID_REFRESH_TOKEN.getAuthException();
+        }
+
+        Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
+        CustomerDetails principal = (CustomerDetails) authentication.getPrincipal();
+        Long userId = principal.getUserId();
+
+        String role = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse("ROLE_GUEST");
+
+        //회전이 필요 없을 수도 있지만, 판정을 Lua 스크립트 안에서 원자적으로 하기 위해 미리 발급해 둔다.
+        //ROTATED가 아니면 이 값은 저장되지 않고 버려진다.
+        String candidateRefreshToken = jwtTokenProvider.createRefreshToken(authentication);
+        RefreshTokenService.ReissueResult result =
+                refreshTokenService.processReissue(userId, refreshToken, candidateRefreshToken);
+
+        return switch (result.status()) {
+            case ROTATED, GRACE -> {
+                String newAccessToken = jwtTokenProvider.createAccessToken(authentication);
+                yield buildTokenResponse(newAccessToken, result.refreshToken(), role);
+            }
+            case REUSE_DETECTED -> throw AuthExceptions.TOKEN_REUSE_DETECTED.getAuthException();
+            case NO_SESSION -> throw AuthExceptions.INVALID_REFRESH_TOKEN.getAuthException();
+        };
+    }
+
+    private TokenResponseDTO buildTokenResponse(String accessToken, String refreshToken, String role) {
         return TokenResponseDTO.builder()
                 .accessToken(accessToken)
                 .accessTokenExpiresIn(jwtTokenProvider.getAccessTokenValiditySeconds())
@@ -88,6 +134,12 @@ public class AuthService {
                 .refreshTokenExpiresIn(jwtTokenProvider.getRefreshTokenValiditySeconds())
                 .role(role)
                 .build();
+    }
+
+    public void logout(String refreshToken) {
+        if (jwtTokenProvider.validateToken(refreshToken) && jwtTokenProvider.isRefreshToken(refreshToken)) {
+            refreshTokenService.delete(jwtTokenProvider.getUserId(refreshToken));
+        }
     }
 
     public boolean checkExistsNickname(String nickname){
@@ -101,7 +153,5 @@ public class AuthService {
     public boolean checkExistsEmail(String email){
         return userRepository.existsByEmail(email);
     }
-
-    //Refresh Token 재발급
 
 }

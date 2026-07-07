@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -63,6 +64,13 @@ public class SecurityConfig {
     }
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        // Prometheus 스크레이핑 등으로 매우 빈번히 호출되는 경로는 시큐리티 필터 체인 자체에서 제외해
+        // 매 요청마다 FilterChainProxy/JwtAuthenticationFilter DEBUG 로그가 쌓이는 것을 막는다.
+        return web -> web.ignoring().requestMatchers("/actuator/health", "/actuator/prometheus");
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -79,8 +87,6 @@ public class SecurityConfig {
                                         "/v3/api-docs/**",
                                         "/v3/api-docs",
                                         "/error",
-                                        "/actuator/health",
-                                        "/actuator/prometheus",
                                         "/images/**"
                                 ).permitAll() // 위의 경로들은 인증 없이 접근 허용
                                 .requestMatchers("/admin/**").hasRole("ADMIN")

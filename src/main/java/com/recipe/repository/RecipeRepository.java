@@ -15,7 +15,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findByRcpSnoIn(Collection<Long> ids);
 
-    // 조회수 누적 UPDATE
     @Modifying
     @Query("UPDATE Recipe r SET r.inqCnt = r.inqCnt + :count WHERE r.rcpSno = :recipeId")
     int incrementViewCount(@Param("recipeId") Long recipeId, @Param("count") int count);

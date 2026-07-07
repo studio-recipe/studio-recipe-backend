@@ -24,7 +24,7 @@ import java.util.Map;
 public class MetricsAdminController {
 
     private final MetricsService metricsService;
-    private final RestClient flaskRestClient;
+    private final RestClient flaskAdminMetricsRestClient;
     private final RecommendMetricsRepository metricsRepository;
 
     @Operation(summary = "최근 추천 지표 조회",
@@ -53,7 +53,7 @@ public class MetricsAdminController {
 
         Map body;
         try {
-            body = flaskRestClient.get()
+            body = flaskAdminMetricsRestClient.get()
                     .uri("/api/admin/metrics")
                     .retrieve()
                     .body(Map.class);

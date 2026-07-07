@@ -1,5 +1,6 @@
 package com.recipe.controller.advice;
 
+import com.recipe.exceptions.auth.AuthException;
 import com.recipe.exceptions.recipe.RecipeException;
 import com.recipe.exceptions.user.UserException;
 import lombok.extern.log4j.Log4j2;
@@ -33,6 +34,18 @@ public class ControllerAdvice {
         HttpStatus status = HttpStatus.resolve(ex.getCode());
         if (status == null) {
             //log
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+        return ResponseEntity.status(status).body(errors);
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<Map<String, String>> AuthEx(AuthException ex) {
+        HttpStatus status = HttpStatus.resolve(ex.getCode());
+        if (status == null) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 

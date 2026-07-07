@@ -25,6 +25,10 @@ import java.util.stream.Collectors;
 @Getter
 public class JwtTokenProvider {
 
+    private static final String CLAIM_TOKEN_TYPE = "type";
+    private static final String TOKEN_TYPE_ACCESS = "access";
+    private static final String TOKEN_TYPE_REFRESH = "refresh";
+
     private final Key key;
     private final long accessTokenValiditySeconds;
     private final long refreshTokenValiditySeconds;
@@ -36,12 +40,12 @@ public class JwtTokenProvider {
     ) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
-        this.accessTokenValiditySeconds = accessTokenValiditySeconds * 1000;
-        this.refreshTokenValiditySeconds = refreshTokenValiditySeconds * 1000;
+        this.accessTokenValiditySeconds = accessTokenValiditySeconds;
+        this.refreshTokenValiditySeconds = refreshTokenValiditySeconds;
     }
 
-    //Access Token, Refresh Token 모두 사용 이유 -> 둘의 구분은 시간이다.
-    public String createToken(Authentication authentication, long validity) {
+    //Access Token, Refresh Token 모두 사용 이유 -> 둘의 구분은 시간 + type 클레임이다.
+    public String createToken(Authentication authentication, long validity, String tokenType) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -57,6 +61,7 @@ public class JwtTokenProvider {
                 .setSubject(userIdStr) //토큰의 주체를 DB PK 값으로 했음
                 .claim("auth", authorities) //권한 정보
                 .claim("username", username)
+                .claim(CLAIM_TOKEN_TYPE, tokenType) //access/refresh 구분
                 .setIssuedAt(new Date(now)) //토큰 발행 시간
                 .setExpiration(validityDate) // 토큰 만료 시간
                 .signWith(key, SignatureAlgorithm.HS256) //서명
@@ -64,11 +69,31 @@ public class JwtTokenProvider {
     }
 
     public String createAccessToken(Authentication authentication) {
-        return createToken(authentication, accessTokenValiditySeconds);
+        return createToken(authentication, accessTokenValiditySeconds * 1000, TOKEN_TYPE_ACCESS);
     }
 
     public String createRefreshToken(Authentication authentication) {
-        return createToken(authentication, refreshTokenValiditySeconds);
+        return createToken(authentication, refreshTokenValiditySeconds * 1000, TOKEN_TYPE_REFRESH);
+    }
+
+    //Refresh Token 여부 확인 (Access Token으로 재발급 시도하는 것을 방지)
+    public boolean isRefreshToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return TOKEN_TYPE_REFRESH.equals(claims.get(CLAIM_TOKEN_TYPE));
+    }
+
+    //토큰 주체(userId) 추출
+    public Long getUserId(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return Long.valueOf(claims.getSubject());
     }
 
     //토큰에서 인증 정보 조회
