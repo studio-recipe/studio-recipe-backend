@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * 문제 1+3: 서버가 여러 대라서 flush 스케줄러가 동시에 두 번 돌면, 겹치는 레시피 두 건을
+ * 서버가 여러 대라서 flush 스케줄러가 동시에 두 번 돌면, 겹치는 레시피 두 건을
  * 서로 다른 순서로 UPDATE하다가 실제 MySQL 데드락이 발생할 수 있다. 이때 패배한 트랜잭션은
  * 롤백되지만, 그 안에서 처리하려던 pending 조회수는 이미 Redis에서 GETDEL로 지워진 뒤라
  * 영구히 사라진다. 멀티서버(동시에 도는 두 개의 flush 인스턴스)가 있어야만 재현된다.

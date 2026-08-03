@@ -14,7 +14,7 @@ spring:
       mail.smtp.auth: false
       mail.smtp.ssl.enable: false
 
-# 테스트 전용 더미 값 - 실제 서비스에는 절대 사용하지 말 것
+# 테스트 전용 더미 값
 JWT_SECRET_KEY: dGVzdC1zZWNyZXQta2V5LWZvci1qdW5pdC10ZXN0cy1vbmx5LW5vdC1mb3ItcHJvZHVjdGlvbi11c2U=
 JWT_ACCESS_TOKEN_VALIDITY_IN_SECONDS: 3600
 JWT_REFRESH_TOKEN_VALIDITY_IN_SECONDS: 604800

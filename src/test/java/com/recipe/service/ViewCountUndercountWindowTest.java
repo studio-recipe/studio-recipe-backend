@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * 문제 5: flush가 Redis 값을 GETDEL로 이미 비웠지만 DB 커밋은 아직 하지 않은 순간에
+ * flush가 Redis 값을 GETDEL로 이미 비웠지만 DB 커밋은 아직 하지 않은 순간에
  * 다른 스레드가 상세 페이지를 읽으면, 실제 합계보다 적은 조회수를 보게 된다.
  * 웹 요청 스레드와 스케줄러 스레드가 같은 JVM 안에서만 있어도 재현되므로 멀티서버가 필요 없다.
  */

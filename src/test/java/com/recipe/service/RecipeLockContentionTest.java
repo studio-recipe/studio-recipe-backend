@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * 문제 4: flush가 특정 레시피 행의 row lock을 잡고 있는 동안, 같은 레시피를
+ * flush가 특정 레시피 행의 row lock을 잡고 있는 동안, 같은 레시피를
  * 수정하려는 유저 요청 스레드는 flush 트랜잭션이 끝날 때까지 대기(블로킹)한다.
  * 웹 요청 스레드와 스케줄러 스레드가 같은 JVM 안에서만 있어도 재현되므로 멀티서버가 필요 없다.
  */

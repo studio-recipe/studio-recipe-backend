@@ -22,7 +22,7 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * 문제 6: 같은 (user, recipe) 조합을 동시에 조회하면 UserReferencesService.upsertPreference의
+ * 같은 (user, recipe) 조합을 동시에 조회하면 UserReferencesService.upsertPreference의
  * "조회 후 생성(check-then-act)" 로직과 유니크 제약 부재 때문에 중복 row가 생긴다.
  * 서버 1대, 스레드 여러 개만으로 재현된다 (멀티서버 불필요).
  */
