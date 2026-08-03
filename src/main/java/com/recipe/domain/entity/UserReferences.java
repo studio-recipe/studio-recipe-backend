@@ -6,7 +6,10 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@Table(name = "USER_REFERENCES")
+@Table(name = "USER_REFERENCES",
+        uniqueConstraints = {
+        @UniqueConstraint(name = "UQ_USER_RECIPE_PREFERENCE", columnNames = {"USER_ID", "RCP_SNO"})
+        })
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
