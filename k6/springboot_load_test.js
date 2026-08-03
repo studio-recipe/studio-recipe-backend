@@ -17,14 +17,14 @@ export const options = {
     },
     load_test: {
       executor: 'constant-vus',
-      vus: 50,
+      vus: 100,
       duration: '30s',
       startTime: '10s',
       tags: { phase: 'load' },
     },
     peak_test: {
       executor: 'constant-vus',
-      vus: 100,
+      vus: 200,
       duration: '20s',
       startTime: '40s',
       tags: { phase: 'peak' },
@@ -57,7 +57,7 @@ export default function (data) {
 
   // 1. 메인 페이지
   const mainRes = http.get(
-    'http://localhost:8080/studio-recipe/main-pages?page=0&size=10',
+    'http://localhost:8080/studio-recipe/main-pages?page=0&size=10&sortBy=RECOMMENDED_COUNT&direction=desc',
     { tags: { name: 'main_page' } }
   );
   mainPageDuration.add(mainRes.timings.duration);

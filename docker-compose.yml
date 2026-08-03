@@ -13,7 +13,14 @@ services:
       - db_data:/var/lib/mysql
       - ./initdb:/docker-entrypoint-initdb.d
       - ./data:/csv
-    command: --local-infile=1
+    # slow-query-log 관련 옵션은 쿼리 튜닝 작업용 임시 설정입니다.
+    # long_query_time=0 은 모든 쿼리를 기록하므로 튜닝이 끝나면 제거하거나 값을 올리세요 (예: 1초).
+    command: >
+      --local-infile=1
+      --slow-query-log=1
+      --slow-query-log-file=/var/lib/mysql/slow.log
+      --long-query-time=0
+      --log-queries-not-using-indexes=1
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DB_USERNAME}", "-p${DB_PASSWORD}"]
       interval: 10s
