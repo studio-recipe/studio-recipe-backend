@@ -113,7 +113,6 @@ public class JwtTokenProvider {
         log.debug("User Principal: {}, Authorities: {}", claims.getSubject(), authorities);
 
         Long userId = Long.valueOf(claims.getSubject());
-        String username = claims.get("username").toString();
         String loginId = (String) claims.get("username");
 
         CustomerDetails principal = new CustomerDetails(userId, loginId, "", authorities);

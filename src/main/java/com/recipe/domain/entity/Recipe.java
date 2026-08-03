@@ -61,12 +61,10 @@ public class Recipe {
     @Column(name = "RCP_IMG_URL")
     private String rcpImgUrl;
 
-    // ── 작성자 연관관계 ─────────────────────────────────────
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User author;
 
-    // ── 비즈니스 메서드 ─────────────────────────────────────
     public void likeToCountUp() { rcmmCnt++; }
 
     public void likeToCountDown() {

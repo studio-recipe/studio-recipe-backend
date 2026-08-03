@@ -26,7 +26,7 @@ public class PageRequestDTO {
     private SortBy sortBy = SortBy.CREATED_AT;
 
     @Builder.Default
-    private String direction = "asc";
+    private String direction = "desc";
 
 
     public Pageable getPageable() {
